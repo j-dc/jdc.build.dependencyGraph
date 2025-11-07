@@ -6,7 +6,7 @@ namespace jdc.build.dependencyGraph {
     public class DependencyGraphService(
         ILogger<DependencyGraphService> logger,
         IConfiguration configuration,
-        Id
+        dotnet.IProjectReader projectReader
     ) : BackgroundService {
 
         private const string _parProjectFile = "projectFile";
