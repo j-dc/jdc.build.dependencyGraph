@@ -5,7 +5,8 @@ using Microsoft.Extensions.Logging;
 namespace jdc.build.dependencyGraph {
     public class DependencyGraphService(
         ILogger<DependencyGraphService> logger,
-        IConfiguration configuration
+        IConfiguration configuration,
+        Id
     ) : BackgroundService {
 
         private const string _parProjectFile = "projectFile";
