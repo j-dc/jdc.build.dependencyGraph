@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "jdc.build.dependencyGraph": {
+      "commandName": "Project",
+      "commandLineArgs": "--projectFile .\\..\\..\\..\\jdc.build.dependencyGraph.csproj --verbose"
+    }
+  }
+}
