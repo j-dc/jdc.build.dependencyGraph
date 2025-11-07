@@ -35,4 +35,4 @@ COPY --from=builder /app /app
 WORKDIR /app
 
 USER app:app
-ENTRYPOINT [ "/app/jdc.build.erd" ]
+ENTRYPOINT [ "/app/jdc.build.dependencyGraph" ]
