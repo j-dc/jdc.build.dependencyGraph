@@ -65,7 +65,7 @@ graph LR
         Newtonsoft.Json --> System.Xml.XmlDocument
 ```
 
-REsulting in this mermaid diagram:
+Resulting in this mermaid diagram:
 
 ```mermaid
 graph LR
