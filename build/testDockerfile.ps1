@@ -9,14 +9,6 @@ write-host $dockerfile;
 
 docker build -t $($containername) -f $dockerfile $root 
 
-$projFile = $(Join-Path $root 'src/jdc.build.dependencyGraph/jdc.build.dependencyGraph.csproj');
+$projPath = $(Join-Path $root 'src');
 
-# mount the projfile under /src in the container
-$projFullPath = (Get-Item $projFile).FullName
-$projFileName = [IO.Path]::GetFileName($projFullPath)
-$containerProjPath = "/src/$projFileName"
-
-
-docker run  -it -v "${projFullPath}:${containerProjPath}" $($containername) 
-
-
+docker run --rm -it -v "${projPath}:/src" $($containername)  --projectFile "/src/jdc.build.dependencyGraph/jdc.build.dependencyGraph.csproj"
