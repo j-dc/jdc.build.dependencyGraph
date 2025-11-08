@@ -38,7 +38,7 @@ namespace jdc.build.dependencyGraph {
                 //second get dependencies from nuget packages
                 sourceReader.InitConfig(projectDir);
                 foreach (DependencyNode dep in items.Values.ToArray()) {
-                    await sourceReader.FetchDependenciesAsync(dep, framework, items, cancellationToken);
+                    await sourceReader.FetchDependenciesAsync(dep, framework, items, ignore, cancellationToken);
                 }
 
                 //last render the graph

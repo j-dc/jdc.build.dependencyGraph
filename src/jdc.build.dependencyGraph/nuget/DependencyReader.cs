@@ -10,7 +10,7 @@ namespace jdc.build.dependencyGraph.nuget;
 
 public interface ISourceReader {
     void InitConfig(DirectoryInfo startDirectory);
-    Task FetchDependenciesAsync(DependencyNode parent, string targetFramework, Dictionary<string, DependencyNode> items, CancellationToken token);
+    Task FetchDependenciesAsync(DependencyNode parent, string targetFramework, Dictionary<string, DependencyNode> items, IEnumerable<string> ignore, CancellationToken token);
 }
 
 public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
@@ -44,17 +44,19 @@ public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
         // Not found
     }
 
-    public async Task FetchDependenciesAsync(DependencyNode parent, string targetFramework, Dictionary<string, DependencyNode> items, CancellationToken token) {
+    public async Task FetchDependenciesAsync(DependencyNode parent, string targetFramework, Dictionary<string, DependencyNode> items, IEnumerable<string> ignore, CancellationToken token) {
         if (_packageSourceMapping is null || _packageSources is null) {
             throw new DependencyGraphException("InitConfig should be called first");
         }
         // Find the correct source for the package    
         string? matchingSourceName = _packageSourceMapping
              .GetConfiguredPackageSources(parent.PackageId)[0];
+
         if (string.IsNullOrWhiteSpace(matchingSourceName)) {
             logger.LogInformation("No source mapping found for package {PackageId}", parent.PackageId);
             return;
         }
+
         PackageSource? matchingSource = _packageSources.FirstOrDefault(s => s.Name.Equals(matchingSourceName, StringComparison.OrdinalIgnoreCase));
         if (matchingSource == null) {
             logger.LogInformation("Mapped source '{SourceName}' not found among enabled sources.", matchingSourceName);
@@ -70,6 +72,7 @@ public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
             logger.LogInformation("Package not found.");
             return;
         }
+
         IEnumerable<PackageDependencyGroup> dependencyGroups = package.DependencySets;
         foreach (PackageDependencyGroup? group in dependencyGroups) {
             foreach (PackageDependency? dependency in group.Packages) {
@@ -77,13 +80,24 @@ public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
                 var newChild = new DependencyNode(dependency.Id, dependency.VersionRange.MinVersion.ToString());
                 string newChildKey = newChild.ToString();
                 if (!items.TryGetValue(newChildKey, out DependencyNode? existingNewItem)) {
-                    items.Add(newChildKey, newChild);
-                    await FetchDependenciesAsync(newChild, targetFramework, items, token);
+                    if (!IsIgnored(newChild.PackageId, ignore)) {
+                        items.Add(newChildKey, newChild);
+                        await FetchDependenciesAsync(newChild, targetFramework, items, ignore, token);
+                    }
                 } else {
                     newChild = existingNewItem;
                 }
                 parent.Edges.TryAdd(newChildKey, new DependencyEdge(newChild, 1));
             }
         }
+    }
+
+    private static bool IsIgnored(string packageid, IEnumerable<string> ignore) {
+        foreach (string dep in ignore) {
+            if (packageid.StartsWith(dep, StringComparison.CurrentCultureIgnoreCase)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
