@@ -24,7 +24,7 @@ LABEL org.opencontainers.image.description="A simple tool to build a simple merm
 LABEL org.opencontainers.image.authors="https://github.com/j-dc"
 LABEL org.opencontainers.image.url="https://ghcr.io/j-dc/jdc-build-dependencygraph"
 
-RUN apk add --no-cache icu-libs
+RUN apk add --no-cache icu-libs krb5-libs
 
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=0
 ENV DOTNET_SYSTEM_GLOBALIZATION_USENLS=false
