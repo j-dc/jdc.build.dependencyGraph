@@ -1,5 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0.203-alpine3.21@sha256:33be1326b4a2602d08e145cf7e4a8db4b243db3cac3bdec42e91aef930656080 AS builder
-
+FROM mcr.microsoft.com/dotnet/sdk:9.0.306-alpine3.22@sha256:85f8507e10f3bf6b1a13e02ab0630918be3993b30bd7706774b77d8b0d1a59ed AS builder
 RUN apk add --no-cache clang build-base zlib-dev icu-libs
 
 ENV APPNAME=jdc.build.dependencyGraph
@@ -20,7 +19,7 @@ RUN dotnet publish ${BUILD_PROJECT} --runtime ${TARGETRUNTIME} -c ${BUILD_CONFIG
 
 ###### ACTUAL CONTAINER ######
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:9.0.4-alpine3.21-amd64@sha256:37831f154882a94d3cc5e86ef64038b3c94eb56ccc175423b9b8a1e311e97667 AS final
+FROM mcr.microsoft.com/dotnet/runtime-deps:9.0.10-alpine3.22@sha256:619ccecf37596f0c875c02472e845cf4d87f1557c75b2f9eeeb772b099f7527f AS final
 LABEL org.opencontainers.image.description="A simple tool to build a simple mermaid graph with dependency of a dotnet project."
 LABEL org.opencontainers.image.authors="https://github.com/j-dc"
 LABEL org.opencontainers.image.url="https://ghcr.io/j-dc/jdc-build-dependencygraph"
@@ -33,6 +32,8 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_USENLS=false
 
 COPY --from=builder /app /app
 WORKDIR /app
+RUN mkdir /src
 
 USER app:app
-ENTRYPOINT [ "/app/jdc.build.dependencyGraph" ]
+#ENTRYPOINT [ "/app/jdc.build.dependencyGraph" ]
+cmd ["sleep", "infinity"]
