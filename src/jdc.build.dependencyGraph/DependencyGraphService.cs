@@ -16,10 +16,35 @@ namespace jdc.build.dependencyGraph {
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
             try {
-                var fi = new FileInfo(configuration[_parProjectFile] ?? "");
-                if (!fi.Exists) {
-                    throw new FileNotFoundException("A project file is needed", fi.FullName);
+                FileInfo? fi = null;
+                string pf = configuration[_parProjectFile] ?? "";
+                if (string.IsNullOrWhiteSpace(pf)
+                    && (
+                        Boolean.TryParse(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") ?? "false", out bool incont)
+                        && incont
+                    )
+                ) {
+                    var di = new DirectoryInfo("/src");
+                    if (di.Exists) {
+                        var projFile = di.GetFiles("*.*proj").FirstOrDefault();
+                        if (projFile is not null) {
+                            fi = projFile;
+                        }
+                    }
+                } else {
+                    fi = new FileInfo(pf);
+
                 }
+
+                if (fi is null) {
+                    throw new DependencyGraphException("A project file could not be defined.");
+                }
+                if (!fi.Exists) {
+                    throw new FileNotFoundException("The given project file could not be found.", fi.FullName);
+                }
+
+                logger.LogInformation("Building dependency graph for project file: {ProjectFile}", fi.FullName);
+
                 List<string> ignore = [];
                 ignore.AddRange((configuration[_parIgnore] ?? "").Split([';', ','], StringSplitOptions.RemoveEmptyEntries));
 
