@@ -19,7 +19,7 @@ public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
     public void InitConfig(DirectoryInfo startDirectory) {
         DirectoryInfo configDir = FindConfigFile(startDirectory) ?? throw new DependencyGraphException("config file not found");
         //READING NUGET     
-        ISettings settings = Settings.LoadSpecificSettings(configDir.FullName, "nuget.config");
+        ISettings settings = Settings.LoadSpecificSettings(configDir.FullName, "Nuget.config");
         //READING SOURCES     
         var packageSourceProvider = new PackageSourceProvider(settings);
         _packageSources = packageSourceProvider
@@ -34,7 +34,7 @@ public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
     private static DirectoryInfo? FindConfigFile(DirectoryInfo startDirectory) {
         DirectoryInfo? currentDir = startDirectory;
         while (currentDir != null) {
-            string configPath = Path.Combine(currentDir.FullName, "nuget.config");
+            string configPath = Path.Combine(currentDir.FullName, "Nuget.config");
             if (File.Exists(configPath)) {
                 return currentDir;
             }
