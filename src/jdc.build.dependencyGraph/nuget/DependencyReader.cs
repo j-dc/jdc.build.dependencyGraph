@@ -13,6 +13,8 @@ public interface ISourceReader {
     Task FetchDependenciesAsync(DependencyNode parent, string targetFramework, Dictionary<string, DependencyNode> items, IEnumerable<string> ignore, CancellationToken token);
 }
 
+
+
 public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
     private IEnumerable<PackageSource>? _packageSources;
     private PackageSourceMapping? _packageSourceMapping;
@@ -25,7 +27,7 @@ public class SourceReader(ILogger<SourceReader> logger) : ISourceReader {
         _packageSources = packageSourceProvider
             .LoadPackageSources()
             .Where(s => s.IsEnabled)
-            ;
+        ;
 
         //READING MAPPING
         _packageSourceMapping = PackageSourceMapping.GetPackageSourceMapping(settings);
